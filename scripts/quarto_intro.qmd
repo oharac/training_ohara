@@ -1,0 +1,51 @@
+---
+title: "Intro to Quarto"
+author: "Casey O'Hara"
+format: html
+editor: visual
+execute: 
+  warning: false
+  message: false
+bibliography: references.bib
+---
+
+# Level 1 header
+
+This is regular plain old boring text
+
+## Level 2 header
+
+-   bulleted list
+-   list item 2
+    -   indented bullet
+
+1.  numbered list
+2.  list item 2
+
+Here is some more **bold** text. But if I want *italics* or *italics*. This is **bold** or **bold**. ***Big emphasis***.
+
+```{r important r code}
+x <- 1 + 2
+```
+
+My important result is `r x` (this is an in-line code chunk) or another important thing is `r 6 * 7`. If you ***want*** text to look like code: `this is code formatted`
+
+```{r}
+x <- 4 * 8
+
+height_ft <- c(5.2, 6.0, 5.7)
+
+blargh <- 3.14
+```
+
+| Col1    | Col2 | Col3 |
+|---------|------|------|
+| thing 1 | 1    |      |
+| thing 2 | 2    |      |
+| ...     | 3    |      |
+| ...     | 4    |      |
+| ...     | 5    |      |
+
+: table 1
+
+Here is a citation[@oke2020]
