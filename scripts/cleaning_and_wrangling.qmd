@@ -133,9 +133,10 @@ head(n_region)
 
 
 ### Use `filter` to subset by rows
+
 ```{r}
 sse_catch <- catch_long %>%
-  filter(Region == 'SSE')
+  filter(Region %in% c('SSE', 'ALU'))
 ```
 
 
