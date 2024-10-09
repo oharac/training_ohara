@@ -9,7 +9,7 @@ Materials for coreR course 10/24
 ## Course lessons
 
 - [intro to literate analysis](scripts/quick_analysis.html)
-- [cleaning and wrangling data](scripts/cleaning_and_wrangling.qmd)
+- [cleaning and wrangling data](scripts/cleaning_and_wrangling.html)
 - data visualizations
 - functions
 
