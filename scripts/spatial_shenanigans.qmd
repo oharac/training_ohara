@@ -1,0 +1,91 @@
+---
+title: "spatial"
+format: html
+---
+
+
+```{r}
+library(readr)
+library(sf)
+library(ggplot2)
+library(leaflet)
+library(scales)
+library(ggspatial)
+library(dplyr)
+library(here)
+```
+
+```{r}
+knb_url <- "https://dev.nceas.ucsb.edu/knb/d1/mn/v2/object/urn%3Auuid%3Aaceaecb2-1ce0-4d41-a839-d3607d32bb58"
+
+download.file(url = knb_url, destfile = here('shapefile_demo_data.zip'))
+
+unzip('shapefile_demo_data.zip', exdir = here('data'))
+
+file.remove(here('shapefile_demo_data.zip'))
+```
+
+```{r}
+ak_regions <- read_sf(here('data/ak_regions_simp.shp'))
+
+plot(ak_regions)
+class(ak_regions)
+```
+
+```{r}
+ak_regions_3338 <- ak_regions %>%
+    st_transform(crs = 3338)
+
+st_crs(ak_regions_3338)
+
+plot(ak_regions_3338)
+```
+
+```{r}
+# read in population data
+pop <- read_csv("data/alaska_population.csv")
+
+pop_4326 <- st_as_sf(pop,
+                     coords = c('lng', 'lat'),
+                     crs = 4326,
+                     remove = F)
+
+head(pop_4326)
+
+pop_3338 <- st_transform(pop_4326, 
+                         crs = 3338)
+```
+
+```{r}
+pop_joined <- st_join(pop_3338, 
+                      ak_regions_3338, 
+                      join = st_within)
+
+head(pop_joined)
+```
+
+```{r}
+pop_by_rgn <- pop_joined %>%
+  st_drop_geometry() %>%
+  group_by(region) %>%
+  summarize(pop = sum(population))
+```
+
+```{r}
+pop_by_rgn_sf <- ak_regions_3338 %>%
+  left_join(pop_by_rgn)
+
+plot(pop_by_rgn_sf['pop'])
+```
+
+```{r}
+ggplot(pop_by_rgn_sf) +
+  geom_sf(aes(fill = pop)) +
+  labs(fill = 'Total pop') +
+  scale_fill_continuous(low = 'khaki', high = 'firebrick',
+                        labels = comma) +
+  theme_void()
+```
+
+
+

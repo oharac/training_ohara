@@ -1,0 +1,88 @@
+---
+title: "Intro to Data Visualization"
+author: "O'Hara"
+format: html
+---
+
+```{r setup}
+#| message: false
+#| warning: false
+
+library(readr)
+library(dplyr)
+library(tidyr)
+library(forcats) # makes working with factors easier
+library(ggplot2)
+library(leaflet) # interactive maps
+library(DT) # interactive tables
+library(scales) # scale functions for visualization
+library(janitor) # expedite cleaning and exploring data
+library(viridis) # colorblind friendly color palette
+```
+
+## Read in data
+
+```{r}
+#| warning: false
+#| message: false
+
+delta_visits_raw <- read_csv('https://portal.edirepository.org/nis/dataviewer?packageid=edi.587.1&entityid=cda8c1384af0089b506d51ad8507641f')
+```
+
+## Data exploration
+
+```{r}
+#| eval: false
+
+colnames(delta_visits_raw)
+
+glimpse(delta_visits_raw)
+
+unique(delta_visits_raw$Date)
+```
+
+## Getting data ready for visualization
+
+```{r}
+delta_visits <- delta_visits_raw %>%
+  janitor::clean_names() %>%
+  rename(restore_loc = eco_restore_approximate_location)
+
+visits_long <- delta_visits %>%
+  pivot_longer(cols = c(sm_boat, med_boat, lrg_boat, bank_angler, scientist, cars),
+               names_to = 'visitor_type',
+               values_to = 'quantity') %>%
+  select(-notes)
+
+
+daily_visits_loc <- visits_long %>%
+  group_by(restore_loc, date, visitor_type) %>%
+  summarize(daily_visits = sum(quantity)) %>%
+  group_by(restore_loc) %>%
+  mutate(n = sum(daily_visits)) %>%
+  ungroup()
+```
+
+## Plotting with `ggplot2`
+
+```{r}
+ggplot(data = daily_visits_loc, 
+       aes(y = fct_reorder(restore_loc, n), 
+           x = daily_visits,
+           fill = visitor_type)) +
+  geom_col() +
+  scale_fill_viridis_d() +
+  labs(fill = 'visitor', x = 'Daily visits') +
+  scale_x_continuous(expand = c(0, 0)) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        axis.title.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        legend.position = c(.8, .4))
+
+ggsave(filename = here::here('plots/visits.png'), 
+       height = 8, width = 12, units = 'cm', dpi = 300)
+```
+
+
+
