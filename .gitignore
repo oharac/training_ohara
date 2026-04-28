@@ -48,3 +48,6 @@ po/*~
 # RStudio Connect folder
 rsconnect/
 .DS_Store
+
+# ignore alaska spatial files
+data/ak_regions/
